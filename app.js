@@ -19,7 +19,7 @@ function App() {
   useEffect(()=>{ setTimeout(()=>setShowSplash(false),1500) },[]);
   useEffect(()=>{ localStorage.setItem('trips',JSON.stringify(trips)) },[trips]);
 
-  const checkPin = () => { if(pin==='1234') setAuthorized(true); else alert('PIN اشتباه است'); }
+  const checkPin = () => { if(pin==='1986') setAuthorized(true); else alert('PIN اشتباه است'); }
   const addTrip = () => {
     if(!newTrip.name.trim()) return alert('نام سفر اجباری است');
     setTrips([...trips,{...newTrip,expenses:[]}]);
