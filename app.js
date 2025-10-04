@@ -60,15 +60,21 @@ function App() {
     },[trip.expenses]);
 
     return <div className="slide-up" style={{padding:'20px'}}>
+      <button onClick={()=>setCurrentTrip(null)} style={{marginBottom:'10px', background:'#ddd', padding:'8px 12px', borderRadius:'5px'}}>⬅️ بازگشت</button>
       <h2>{trip.name} - {trip.destination}</h2>
       <h3>مجموع: {total} {trip.currency}</h3>
       <div className="card">
-        <input placeholder="توضیح" value={desc} onChange={e=>setDesc(e.target.value)} />
-        <input type="number" placeholder="مبلغ" value={amount} onChange={e=>setAmount(e.target.value)} />
-        <button onClick={()=>{addExpense(currentTrip,desc,amount); setDesc(''); setAmount('');}}>افزودن هزینه</button>
+        <input placeholder="توضیح هزینه" value={desc} onChange={e=>setDesc(e.target.value)} /><br/>
+        <input type="number" placeholder="مبلغ" value={amount} onChange={e=>setAmount(e.target.value)} /><br/>
+        <button onClick={()=>{addExpense(currentTrip,desc,amount); setDesc(''); setAmount('');}}>➕ افزودن هزینه</button>
       </div>
-      <canvas id="chart"></canvas>
-      <button onClick={()=>setCurrentTrip(null)}>بازگشت</button>
+      <canvas id="chart" style={{marginTop:'20px'}}></canvas>
+      {trip.expenses.length > 0 && <div className="card" style={{marginTop:'10px'}}>
+        <h4>لیست هزینه‌ها:</h4>
+        <ul>
+          {trip.expenses.map((e,i)=><li key={i}>{e.date} - {e.desc}: {e.amount} {trip.currency}</li>)}
+        </ul>
+      </div>}
     </div>;
   }
 
