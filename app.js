@@ -33,16 +33,15 @@ function App() {
     newTrips[tripIndex].expenses.push(expense);
     setTrips(newTrips);
 
-    // هشدار حد روزانه و هتل
     const totalToday = newTrips[tripIndex].expenses.filter(e=>e.date===expense.date).reduce((a,b)=>a+b.amount,0);
-    if(totalToday>40) alert('⚠️ هشدار: هزینه روزانه بیشتر از 40 دلار شد!');
-    if(amount>120) alert('⚠️ هشدار: هزینه هتل بیشتر از 120 دلار شد!');
+    if(totalToday>40) alert('⚠️ هزینه روزانه بیشتر از 40 دلار شد!');
+    if(amount>120) alert('⚠️ هزینه هتل بیشتر از 120 دلار شد!');
   }
 
-  if(showSplash) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',fontSize:'2rem', animation:'fadein 1s'}}>💰 دستیار مالی سفر</div>;
+  if(showSplash) return <div className="fade-in" style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',fontSize:'2rem'}}>💰 دستیار مالی سفر</div>;
 
   if(!authorized) return (
-    <div style={{padding:'20px'}}>
+    <div className="slide-up" style={{padding:'20px'}}>
       <h2>ورود با PIN</h2>
       <input type="password" placeholder="PIN ۴ رقمی" value={pin} onChange={e=>setPin(e.target.value)} />
       <button onClick={checkPin}>ورود</button>
@@ -60,7 +59,7 @@ function App() {
       new Chart(ctx,{type:'bar',data:{labels:trip.expenses.map(e=>e.desc),datasets:[{label:'هزینه',data:trip.expenses.map(e=>e.amount),backgroundColor:'#4CAF50'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
     },[trip.expenses]);
 
-    return <div style={{padding:'20px'}}>
+    return <div className="slide-up" style={{padding:'20px'}}>
       <h2>{trip.name} - {trip.destination}</h2>
       <h3>مجموع: {total} {trip.currency}</h3>
       <div className="card">
