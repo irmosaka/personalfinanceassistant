@@ -10,20 +10,30 @@ const currencies = [
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
+  const [pin, setPin] = useState('');
   const [trips, setTrips] = useState([]);
   const [currentTrip, setCurrentTrip] = useState(null);
   const [newTrip, setNewTrip] = useState({name:'',destination:'',currency:'CNY'});
-  const [pin, setPin] = useState('');
-  const [authorized, setAuthorized] = useState(false);
 
-  useEffect(()=>{setTimeout(()=>setShowSplash(false),1500)},[]);
+  useEffect(() => setTimeout(() => setShowSplash(false), 1500), []);
 
-  const checkPin = () => { if(pin === '1234') setAuthorized(true); else alert('PIN اشتباه است'); }
+  const checkPin = () => { 
+    if(pin === '1234') setAuthorized(true); 
+    else alert('PIN اشتباه است'); 
+  }
 
   const addTrip = () => {
     if(!newTrip.name.trim()) return alert("نام سفر اجباری است");
-    setTrips([...trips,newTrip]);
+    setTrips([...trips, {...newTrip, expenses:[]}]);
     setNewTrip({name:'',destination:'',currency:'CNY'});
+  }
+
+  const addExpense = (tripIndex, desc, amount) => {
+    if(!desc || !amount) return alert('توضیح و مبلغ لازم است');
+    const newTrips = [...trips];
+    newTrips[tripIndex].expenses.push({desc, amount:Number(amount)});
+    setTrips(newTrips);
   }
 
   if(showSplash) return <div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',fontSize:'2rem'}}>💰 دستیار مالی سفر</div>;
@@ -38,29 +48,37 @@ function App() {
 
   if(currentTrip !== null){
     const trip = trips[currentTrip];
-    const [expenses,setExpenses] = useState([]);
-    const [newExpense,setNewExpense] = useState({desc:'',amount:0});
-    const addExpense = () => {
-      if(!newExpense.desc || !newExpense.amount) return alert('توضیح و مبلغ لازم است');
-      setExpenses([...expenses,newExpense]);
-      setNewExpense({desc:'',amount:0});
-    }
-    const total = expenses.reduce((a,b)=>a+b.amount,0);
+    const [desc, setDesc] = useState('');
+    const [amount, setAmount] = useState('');
+    const total = trip.expenses.reduce((a,b)=>a+b.amount,0);
+    
+    useEffect(() => {
+      const ctx = document.getElementById('chart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: trip.expenses.map(e=>e.desc),
+          datasets: [{ label:'هزینه', data: trip.expenses.map(e=>e.amount), backgroundColor:'#4CAF50' }]
+        },
+        options: { responsive:true, plugins:{legend:{display:false}} }
+      });
+    }, [trip.expenses]);
+
     return (
       <div style={{padding:'20px'}}>
         <h2>{trip.name} - {trip.destination}</h2>
-        <h3>مبلغ کل: {total} {trip.currency}</h3>
-        <div>
-          <input placeholder="توضیح" value={newExpense.desc} onChange={e=>setNewExpense({...newExpense,desc:e.target.value})}/>
-          <input type="number" placeholder="مبلغ" value={newExpense.amount} onChange={e=>setNewExpense({...newExpense,amount:Number(e.target.value)})}/>
-          <button onClick={addExpense}>افزودن هزینه</button>
-        </div>
-        <button onClick={()=>setCurrentTrip(null)}>بازگشت</button>
+        <h3>مجموع هزینه‌ها: {total} {trip.currency}</h3>
+
         <div className="card">
-          <canvas id="chart"></canvas>
+          <input placeholder="توضیح" value={desc} onChange={e=>setDesc(e.target.value)} />
+          <input type="number" placeholder="مبلغ" value={amount} onChange={e=>setAmount(e.target.value)} />
+          <button onClick={()=>{addExpense(currentTrip, desc, amount); setDesc(''); setAmount('');}}>افزودن هزینه</button>
         </div>
+
+        <canvas id="chart"></canvas>
+        <button onClick={()=>setCurrentTrip(null)}>بازگشت</button>
       </div>
-    )
+    );
   }
 
   return (
@@ -69,6 +87,7 @@ function App() {
       <ul>
         {trips.map((t,i)=><li key={i}><button onClick={()=>setCurrentTrip(i)}>{t.name} - {t.destination}</button></li>)}
       </ul>
+
       <div className="card">
         <h3>افزودن سفر جدید</h3>
         <input placeholder="نام سفر" value={newTrip.name} onChange={e=>setNewTrip({...newTrip,name:e.target.value})} /><br/>
@@ -79,7 +98,7 @@ function App() {
         <button className="fab" onClick={addTrip}>+</button>
       </div>
     </div>
-  )
+  );
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
